@@ -12,7 +12,8 @@ public enum  CustomErrorCode implements ICustomErrorCode {
     NO_LOGIN(2003,"未登录"),
     SYS_ERROR(2004,"系统异常"),
     NOT_COMMENT_EXIST(2006,"回复的评论不存在"),
-    NOT_QUESTION_EXIST(2007,"回复的问题不存在");
+    NOT_QUESTION_EXIST(2007,"回复的问题不存在"),
+    NOT_NULL(2008,"输入内容不能为空");
     private String message;
     private Integer code;
 

@@ -24,6 +24,8 @@ img.media-object{
 .forum-menu {
     color: #999;
     font-size: 13px;
+    margin-bottom: 15px;
+    display: block;
 }
 .jumbotron {
     margin: 50px;
@@ -37,4 +39,17 @@ img.media-object{
 .btn-comment {
     float: right;
     margin-bottom: 10px;
+}
+.menu {
+    color: #999;
+    font-size: 15px;
+    margin-top: 5px;
+}
+.menu .icon {
+    margin-right: 6px;
+    font-size: 15px;
+    cursor: pointer;
+}
+.menu .icon:hover {
+    color: #2e6da4;
 }

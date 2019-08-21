@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @param <T>
  * @Author: chenjianwei
@@ -30,4 +32,17 @@ public interface UserMapper {
 
     @Update("update user set name = #{name}, token = #{token}, gmt_modified = #{gmtModified}, avatar_url = #{avatarUrl} where id = #{id}")
     Integer update(User user);
+
+    // @Select("select * from user where id in (#{commentators})")
+    @Select({
+            "<script>",
+            "select",
+            "*",
+            "from user",
+            "where id in",
+            "<foreach collection='commentators' item='id' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</script>"})
+    List<User> findUserInIds(@Param("commentators") List<Long> commentators);
 }

@@ -33,11 +33,42 @@
                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         编辑
                     </a>
-
                 </div>
-                <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="comment_section">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h4><span th:text="${question.commentCount}"></span>个回复</h4>
+                    <!-- 回复-->
+                    <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 0;"/>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:each="comment: ${comments}"
+                         style="margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #eeeeee;">
+                        <div class="media" >
+                            <div class="media-left">
+                                <a href="#">
+                                    <img th:src="${comment.user.avatarUrl}"
+                                         class="media-object img-rounded" alt="头像">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h5 class="media-heading">
+                                    <span th:text="${comment.user.name}"></span>
+                                </h5>
+                                <div th:text="${comment.content}">
 
+                                </div>
+                                <div class="menu">
+                                    <span class="glyphicon glyphicon-thumbs-up icon"></span>
+                                    <span class="glyphicon glyphicon-comment icon"></span>
+                                    <span class="pull-right" th:text="${#dates.format(question.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 回复输入框-->
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h4> 提交回复</h4>
+                    <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="comment_section">
                     <div class="media">
                         <div class="media-left">
                             <a href="#">
@@ -57,11 +88,11 @@
                     <!-- Indicates a successful or positive action -->
                     <button type="button" onclick="post()" id="button-save" class="btn btn-success btn-comment">回复</button>
                 </div>
-
-
+                </div>
             </div>
-            </span>
+
         </div>
+            <!-- 右边-->
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <h4>发起人</h4>
@@ -93,6 +124,10 @@
     function post() {
         var questionId = $('#question_id').val();
         var content = $('#content').val();
+        if(!content) {
+            alert('输入信息不能为空!');
+            return;
+        }
         $.ajax({
             dataType: 'json',
             type: 'POST',
@@ -102,11 +137,14 @@
             success: function (res) {
                 if(res.code === 200) {
                     $('#comment_section').hide();
+                    window.location.reload();
                 } else {
                     if (res.code === 2003) {
                         var isAccepted = window.confirm(res.message);
                         if (isAccepted) {
                             window.open('https://github.com/login/oauth/authorize?client_id=Iv1.ae520d7c645bbe07&redirect_uri=http://localhost:8887/callback&state=1');
+                            window.localStorage.setItem('closable', true);
+
                         }
                     } else {
                         $('#comment_section').show();

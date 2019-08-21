@@ -1,12 +1,13 @@
 package com.cjw.forum.mappper;
 
-import com.cjw.forum.dto.CommentDto;
 import com.cjw.forum.model.Comment;
-import com.cjw.forum.model.Question;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @param <>
@@ -21,4 +22,7 @@ public interface CommentMapper {
      void insert(Comment comment);
     @Select("select * from comment where id = #{parentId})")
     Comment getById(Long parentId);
+
+    @Select("select * from comment where type = #{type} and parent_id = #{id} order by gmt_create desc")
+    List<Comment> listByQuestionId(@Param("type") Integer type, @Param("id") Long id);
 }

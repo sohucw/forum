@@ -19,7 +19,7 @@ public interface QuestionMapper {
     @Insert("insert into question (title,description,tag,gmt_create,gmt_modified,creator) values (#{title}, #{description}, #{tag}, #{gmtCreate}, #{gmtModified}, #{creator})")
     public void create(Question question);
 
-    @Select("select * from question limit #{offset}, #{size}")
+    @Select("select * from question limit #{offset}, #{size} order by gmt_create desc")
     List<Question> list(@Param(value = "offset") Integer offset, @Param(value = "size")Integer size);
 
     @Select("select count(1) from question")
@@ -40,4 +40,7 @@ public interface QuestionMapper {
 
     @Update("update question set comment_count = comment_count + 1 where id = #{id}")
     void updateCommentViewCountById(Long id);
+
+
+
 }

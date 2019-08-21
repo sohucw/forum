@@ -1,12 +1,11 @@
 package com.cjw.forum.controller;
 
-import com.cjw.forum.dto.CommentDto;
+import com.cjw.forum.dto.CommentCreateDto;
 import com.cjw.forum.dto.ResultDto;
 import com.cjw.forum.exception.CustomErrorCode;
-import com.cjw.forum.mappper.CommentMapper;
-import com.cjw.forum.model.Comment;
 import com.cjw.forum.model.User;
 import com.cjw.forum.service.CommentService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @param <>
@@ -31,12 +28,15 @@ public class CommentController {
 
     @PostMapping("/comment")
     @ResponseBody
-    public Object post(@RequestBody CommentDto commentDto, HttpServletRequest request) {
+    public Object post(@RequestBody CommentCreateDto commentCreateDto, HttpServletRequest request) {
         User user = (User)request.getSession().getAttribute("user");
         if (user == null) {
             return ResultDto.errorOf(CustomErrorCode.NO_LOGIN);
         }
-        commentService.insert(commentDto, user);
+        if (commentCreateDto == null || StringUtils.isBlank(commentCreateDto.getContent())) {
+            return ResultDto.errorOf(CustomErrorCode.NOT_NULL);
+        }
+        commentService.insert(commentCreateDto, user);
         return  ResultDto.okOf();
     }
 }
