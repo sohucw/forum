@@ -14,6 +14,7 @@ https://github.com/settings/apps/chenyimo-forum
 [github-oauth-认证步骤](https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/)
 
 [markdown富文本编辑](http://editor.md.ipandao.com/examples/)
+[ufile sdk](https://github.com/ucloud/ufile-sdk-java)
 ### 开源的论坛 类似这个（https://elasticsearch.cn ）
 
 ### Reference Documentation

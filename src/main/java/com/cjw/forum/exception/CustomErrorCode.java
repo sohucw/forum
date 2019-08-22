@@ -15,7 +15,8 @@ public enum  CustomErrorCode implements ICustomErrorCode {
     NOT_QUESTION_EXIST(2007,"回复的问题不存在"),
     NOT_NULL(2008,"输入内容不能为空"),
     READ_NOTFICATION_FAIL(2009,"读的别人的信息"),
-    NOT_FOUND_NOTFICATION(2010,"没找到改通知");
+    NOT_FOUND_NOTFICATION(2010,"没找到改通知"),
+    FILE_UPLOAD_ERROR(2011,"上传失败");
     private String message;
     private Integer code;
 
