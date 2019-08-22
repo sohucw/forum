@@ -2,6 +2,7 @@ package com.cjw.forum.interceptor;
 
 import com.cjw.forum.mappper.UserMapper;
 import com.cjw.forum.model.User;
+import com.cjw.forum.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,10 +23,11 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for(Cookie cookie : cookies) {
@@ -34,12 +36,13 @@ public class SessionInterceptor implements HandlerInterceptor {
                     User user = userMapper.findByToken(token);
                     if(user != null) {
                         request.getSession().setAttribute("user", user);
+                        Long unreadCount = notificationService.unreadCount(user.getId());
+                        request.getSession().setAttribute("unreadCount", unreadCount);
                     }
                     break;
                 }
             }
         }
-
         return true;
     }
 

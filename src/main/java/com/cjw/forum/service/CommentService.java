@@ -3,12 +3,16 @@ package com.cjw.forum.service;
 import com.cjw.forum.dto.CommentCreateDto;
 import com.cjw.forum.dto.CommentDto;
 import com.cjw.forum.enums.CommentTypeEnum;
+import com.cjw.forum.enums.NotificationEnum;
+import com.cjw.forum.enums.NotificationStatusEnum;
 import com.cjw.forum.exception.CustomErrorCode;
 import com.cjw.forum.exception.CustomException;
 import com.cjw.forum.mappper.CommentMapper;
+import com.cjw.forum.mappper.NotificationMapper;
 import com.cjw.forum.mappper.QuestionMapper;
 import com.cjw.forum.mappper.UserMapper;
 import com.cjw.forum.model.Comment;
+import com.cjw.forum.model.Notification;
 import com.cjw.forum.model.Question;
 import com.cjw.forum.model.User;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +40,9 @@ public class CommentService {
     private QuestionMapper questionMapper;
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    private NotificationMapper notificationMapper;
     @Transactional
     public void insert(CommentCreateDto commentCreateDto, User user) {
         Comment comment = new Comment();
@@ -48,15 +55,26 @@ public class CommentService {
         if(commentCreateDto.getParentId()== null || commentCreateDto.getParentId() ==0) {
             throw new CustomException(CustomErrorCode.SYS_ERROR);
         }
+        // 回复评论
         if (commentCreateDto.getType() == CommentTypeEnum.COMMENT.getType()) {
             Comment dbComment = commentMapper.getById(commentCreateDto.getParentId());
             if (dbComment == null) {
                 throw new CustomException(CustomErrorCode.NOT_COMMENT_EXIST);
             }
+            // 回复问题
+            Question dbQuestion = questionMapper.getById(dbComment.getParentId());
+            if (dbQuestion == null) {
+                throw new CustomException(CustomErrorCode.NOT_QUESTION_EXIST);
+            }
             comment.setType(CommentTypeEnum.COMMENT.getType());
             commentMapper.insert(comment);
-            // 回复评论
+            // 增加评论数
+            commentMapper.updateCommentViewCountById(commentCreateDto.getParentId());
+            // 创建通知
+
+            createNotify(comment, dbComment.getCommentator(), user.getName(), dbQuestion.getTitle(), NotificationEnum.REPLY_COMMENT, dbQuestion.getId());
         } else {
+            // 回复问题
             Question dbQuestion = questionMapper.getById(commentCreateDto.getParentId());
             if (dbQuestion == null) {
                 throw new CustomException(CustomErrorCode.NOT_QUESTION_EXIST);
@@ -64,13 +82,29 @@ public class CommentService {
             comment.setType(CommentTypeEnum.QUESTION.getType());
             commentMapper.insert(comment);
             questionMapper.updateCommentViewCountById(commentCreateDto.getParentId());
-        }
+            // 创建通知
+            createNotify(comment, dbQuestion.getCreator(),user.getName(), dbQuestion.getTitle(), NotificationEnum.REPLY_QUESTION, dbQuestion.getId());
 
+        }
 
     }
 
-    public List<CommentDto> listByQuestionId(Long id) {
-        List<Comment> comments = commentMapper.listByQuestionId(CommentTypeEnum.QUESTION.getType(), id);
+    private void createNotify(Comment comment, Long receiver, String notifierName, String outTitle, NotificationEnum notificationEnum, Long outerid) {
+        Notification notification = new Notification();
+        notification.setGmtCreate(System.currentTimeMillis());
+        notification.setType(notificationEnum.getType());
+        Long parentId = comment.getParentId();
+        notification.setOuterid(outerid);
+        notification.setNotifier(comment.getCommentator());
+        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
+        notification.setReceiver(receiver);
+        notification.setNotifierName(notifierName);
+        notification.setOuterTitle(outTitle);
+        notificationMapper.insert(notification);
+    }
+
+    public List<CommentDto> listByTargetId(Long id, Integer type) {
+        List<Comment> comments = commentMapper.listByQuestionId(type, id);
         if(comments.size() ==0 ) {
             return  new ArrayList<>();
         }

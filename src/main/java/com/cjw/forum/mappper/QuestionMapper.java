@@ -17,10 +17,13 @@ import java.util.List;
 @Component
 public interface QuestionMapper {
     @Insert("insert into question (title,description,tag,gmt_create,gmt_modified,creator) values (#{title}, #{description}, #{tag}, #{gmtCreate}, #{gmtModified}, #{creator})")
-    public void create(Question question);
+    void create(Question question);
 
-    @Select("select * from question limit #{offset}, #{size} order by gmt_create desc")
+    @Select("select * from question order by gmt_create desc limit #{offset}, #{size}")
     List<Question> list(@Param(value = "offset") Integer offset, @Param(value = "size")Integer size);
+
+    @Select("select * from question where id != #{id} and tag regexp #{tag}")
+    List<Question> listLikeTag(Long id, String tag);
 
     @Select("select count(1) from question")
     Integer count();

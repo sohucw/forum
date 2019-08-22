@@ -13,14 +13,14 @@ import java.util.List;
  * @Date: Created in 16:26 2019-08-15
  */
 @Data
-public class PageDto {
+public class PageDto<T> {
     private boolean showPrevious; // 是否有向前按钮
     private boolean showFirstPage; // 第一页按钮
     private boolean showNext; // 是否有向后按钮
     private boolean showEndPage; // 最后按钮
     private Integer page; // 第几页 currPage
     private Integer size; // 每页多少条
-    private List<QuestionDto> questions;
+    private List<T> data;
 
     private Integer totalPage;
 

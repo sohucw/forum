@@ -8,12 +8,16 @@ import com.cjw.forum.mappper.QuestionMapper;
 import com.cjw.forum.mappper.UserMapper;
 import com.cjw.forum.model.Question;
 import com.cjw.forum.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * @param
@@ -28,6 +32,25 @@ public class QuestionService {
     private QuestionMapper questionMapper;
     @Autowired
     private UserMapper userMapper;
+
+    public List<QuestionDto> selectRelated(QuestionDto questionDto) {
+        if(StringUtils.isBlank(questionDto.getTag())) {
+            return new ArrayList<>();
+        }
+        // new StringJoiner("|")
+        String[] tags = StringUtils.split(questionDto.getTag(), ",");
+        String regexpTag = Arrays.stream(tags).collect(Collectors.joining("|"));
+        Question question = new Question();
+        question.setId(questionDto.getId());
+        question.setTag(regexpTag);
+        List<Question> questions = questionMapper.listLikeTag(questionDto.getId(), regexpTag);
+        List<QuestionDto> collect = questions.stream().map(q -> {
+            QuestionDto questionDto1 = new QuestionDto();
+             BeanUtils.copyProperties(q, questionDto1);
+            return questionDto1;
+        }).collect(Collectors.toList());
+        return collect;
+    }
 
 
     public PageDto list(Integer page, Integer size) {
@@ -62,7 +85,7 @@ public class QuestionService {
             questionDtoList.add(questionDto);
         }
 
-        pageDto.setQuestions(questionDtoList);
+        pageDto.setData(questionDtoList);
         return pageDto;
     }
 
@@ -98,7 +121,7 @@ public class QuestionService {
             questionDtoList.add(questionDto);
         }
 
-        pageDto.setQuestions(questionDtoList);
+        pageDto.setData(questionDtoList);
         return pageDto;
     }
 

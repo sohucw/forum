@@ -50,6 +50,44 @@ img.media-object{
     font-size: 15px;
     cursor: pointer;
 }
+.menu .active {
+    color: #2e6da4;
+}
 .menu .icon:hover {
     color: #2e6da4;
+}
+.question-related {
+    line-height: 20px;
+    font-size: 12px;
+    margin-left: 0;
+    list-style: none;
+    padding-left: 0;
+}
+.question-tag {
+    margin-right: 5px;
+}
+
+.question-related {
+    line-height: 20px;
+    font-size: 12px;
+    margin-left: 0;
+    list-style: none;
+    padding-left: 0;
+}
+
+.question-wechat {
+    width: 95%;
+}
+
+.publish-tag-tab {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.publish-tag-tab .label-info {
+    white-space: normal;
+    margin: 5px 5px;
+    display: inline-block;
+    cursor: pointer;
 }

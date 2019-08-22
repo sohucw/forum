@@ -2,12 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${question.title}"></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/css/bootstrap-theme.min.css"/>
-    <link rel="stylesheet" href="/css/base.css"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/editormd.min.css" />
+    <link rel="stylesheet" href="/css/editormd.preview.min.css" />
     <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/editormd.min.js"></script>
+    <script type="text/javascript" src="/js/lib/marked.min.js"></script>
+    <script type="text/javascript" src="/js/lib/prettify.min.js"></script>
 </head>
 <body>
 
@@ -24,8 +29,26 @@
                 阅读数：<span th:text="${question.viewCount}"></span>
                 </span>
                 <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:text="${question.description}"></div>
 
+
+                <!--内容-->
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="question-view">
+                    <textarea style="display:none;" th:text="${question.description}"></textarea>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        editormd.markdownToHTML("question-view", {});
+                    });
+                </script>
+
+
+                <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <span class="label label-info question-tag" th:each="tag : ${question.tag.split(',')}">
+                        <span class="glyphicon glyphicon-tags"></span>
+                        <span class="label label-info" th:text="${tag}"></span>
+                    </span>
+                </div>
                 <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <a th:href="@{'/publish/' + ${question.id}}" class="forum-menu"
@@ -40,24 +63,33 @@
                     <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 0;"/>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:each="comment: ${comments}"
                          style="margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #eeeeee;">
-                        <div class="media" >
+                        <div class="media">
                             <div class="media-left">
                                 <a href="#">
                                     <img th:src="${comment.user.avatarUrl}"
                                          class="media-object img-rounded" alt="头像">
                                 </a>
                             </div>
-                            <div class="media-body">
+                            <div class="media-body" th:id="${'comment-body-'+comment.id}">
+
                                 <h5 class="media-heading">
                                     <span th:text="${comment.user.name}"></span>
                                 </h5>
-                                <div th:text="${comment.content}">
-
-                                </div>
+                                <div th:text="${comment.content}"> </div>
                                 <div class="menu">
                                     <span class="glyphicon glyphicon-thumbs-up icon"></span>
-                                    <span class="glyphicon glyphicon-comment icon"></span>
+                                    <span class="glyphicon glyphicon-comment icon" th:data-id="${comment.id}" onclick="collspseComments(this)"></span>
+                                    <span th:text="${comment.commentCount}"></span>
                                     <span class="pull-right" th:text="${#dates.format(question.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span>
+
+                                </div>
+                                <!-- // 二级评论-->
+                                <div style="border-radius: 5px; margin-top: 10px;  margin-bottom: 15px; border: 1px solid #eee; padding-top: 15px;"
+                                     class="col-lg-12 col-md-12 col-sm-12 col-xs-12 collapse" th:id="${'comment-' + comment.id}">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <input th:id="${'input-' + comment.id}"  type="text" class="form-control" placeholder="评论一下....">
+                                        <button onclick="comment(this)" th:data-id="${comment.id}" style="margin: 10px 0;" type="button" class="btn btn-success pull-right">评论</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -114,6 +146,11 @@
             <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12"/>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <h4>相关问题</h4>
+                <ul class="question-related">
+                    <li th:each="related : ${relatedQuestions}">
+                        <a th:href="@{'/question/'+ ${related.id}}" th:text="${related.title}"></a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -133,7 +170,7 @@
             type: 'POST',
             contentType: 'application/json',
             url: '/comment',
-            data: JSON.stringify({parentId: questionId, content: content}),
+            data: JSON.stringify({parentId: questionId, content: content, type: 1}),
             success: function (res) {
                 if(res.code === 200) {
                     $('#comment_section').hide();
@@ -156,7 +193,99 @@
         });
 
     }
-    
+    function comment(e) {
+        var commentId = e.getAttribute('data-id');
+        var content = $('#input-' + commentId).val();
+        if(!content) {
+            alert('输入信息不能为空!');
+            return;
+        }
+        $.ajax({
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            url: '/comment',
+            data: JSON.stringify({parentId: commentId, content: content, type: 2}),
+            success: function (res) {
+                if(res.code === 200) {
+                    $('#comment_section').hide();
+                    window.location.reload();
+                } else {
+                    if (res.code === 2003) {
+                        var isAccepted = window.confirm(res.message);
+                        if (isAccepted) {
+                            window.open('https://github.com/login/oauth/authorize?client_id=Iv1.ae520d7c645bbe07&redirect_uri=http://localhost:8887/callback&state=1');
+                            window.localStorage.setItem('closable', true);
+
+                        }
+                    } else {
+                        $('#comment_section').show();
+                        alert(res.message);
+                    }
+
+                }
+            }
+        });
+    }
+
+
+
+    // 展开二级回复
+    function  collspseComments(e) {
+        var id = e.getAttribute('data-id');
+        var target = $('#comment-' + id);
+        if (target.hasClass('in')) {
+            target.removeClass('in');
+            $(e).removeClass('active');
+        } else {
+            // 展开的时候加载二级评论的list
+            if(target.children().length<2) {
+                this.getTwoLevel(id);
+            }
+            target.addClass('in');
+            $(e).addClass('active');
+        }
+    }
+
+    function getTwoLevel(id) {
+        var subCommentContainer = $("#comment-" + id);
+        $.getJSON("/comment/" + id, function (data) {
+            $.each(data.data.reverse(), function (index, comment) {
+                var mediaLeftElement = $("<div/>", {
+                    "class": "media-left"
+                }).append($("<img/>", {
+                    "class": "media-object img-rounded",
+                    "src": comment.user.avatarUrl
+                }));
+
+                var mediaBodyElement = $("<div/>", {
+                    "class": "media-body"
+                }).append($("<h5/>", {
+                    "class": "media-heading",
+                    "html": comment.user.name
+                })).append($("<div/>", {
+                    "html": comment.content
+                })).append($("<div/>", {
+                    "class": "menu"
+                }).append($("<span/>", {
+                    "class": "pull-right",
+                    "html": moment(comment.gmtCreate).format('YYYY-MM-DD')
+                })));
+
+                var mediaElement = $("<div/>", {
+                    "class": "media"
+                }).append(mediaLeftElement).append(mediaBodyElement);
+
+                var commentElement = $("<div/>", {
+                    "class": "col-lg-12 col-md-12 col-sm-12 col-xs-12 comments"
+                }).append(mediaElement);
+
+                subCommentContainer.prepend(commentElement);
+            });
+
+        });
+
+    }
 </script>
 </body>
 </html>

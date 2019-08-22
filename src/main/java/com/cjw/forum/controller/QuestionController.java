@@ -1,8 +1,8 @@
 package com.cjw.forum.controller;
 
-import com.cjw.forum.dto.CommentCreateDto;
 import com.cjw.forum.dto.CommentDto;
 import com.cjw.forum.dto.QuestionDto;
+import com.cjw.forum.enums.CommentTypeEnum;
 import com.cjw.forum.service.CommentService;
 import com.cjw.forum.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +30,13 @@ public class QuestionController {
     @GetMapping("/question/{id}")
     public String question(@PathVariable(name = "id") Long id, Model model) {
         QuestionDto questionDto = questionService.getById(id);
-        List<CommentDto> commentCreateDtoList = commentService.listByQuestionId(id);
+        List<QuestionDto> relatedQuestions = questionService.selectRelated(questionDto);
+        List<CommentDto> commentCreateDtoList = commentService.listByTargetId(id, CommentTypeEnum.QUESTION.getType());
         //         // 累计阅读数
         questionService.incView(id);
         model.addAttribute("question", questionDto);
         model.addAttribute("comments", commentCreateDtoList);
-
+        model.addAttribute("relatedQuestions", relatedQuestions);
         return "question";
     }
 

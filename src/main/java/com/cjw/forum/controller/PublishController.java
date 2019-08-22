@@ -1,11 +1,14 @@
 package com.cjw.forum.controller;
 
+import com.cjw.forum.cache.TagCache;
 import com.cjw.forum.dto.QuestionDto;
 import com.cjw.forum.mappper.QuestionMapper;
 import com.cjw.forum.mappper.UserMapper;
 import com.cjw.forum.model.Question;
 import com.cjw.forum.model.User;
 import com.cjw.forum.service.QuestionService;
+import com.sun.org.apache.xpath.internal.operations.Mod;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,12 +38,14 @@ public class PublishController {
         model.addAttribute("description", question.getDescription());
         model.addAttribute("tag", question.getTag());
         model.addAttribute("id", question.getId());
+        model.addAttribute("tags", TagCache.get());
         return "publish";
     }
 
 
     @GetMapping("/publish")
-    public String pubish() {
+    public String pubish(Model model) {
+        model.addAttribute("tags", TagCache.get());
         return "publish";
     }
 
@@ -67,6 +72,13 @@ public class PublishController {
            model.addAttribute("error", "标签不能为空");
            return "publish";
        }
+
+       String invlid = TagCache.filterInvalid(tag);
+       if(StringUtils.isNoneBlank(invlid)) {
+           model.addAttribute("error", "输入非法标签");
+           return "publish";
+       }
+
 
        User user = (User)request.getSession().getAttribute("user");
        if(user == null) {
