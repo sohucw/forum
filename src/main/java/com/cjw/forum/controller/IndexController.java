@@ -33,9 +33,11 @@ public class IndexController {
     @GetMapping("/")
     public String index(Model model,
                         @RequestParam(name = "page", defaultValue = "1") Integer page, // 当前页面
-                        @RequestParam(name = "size", defaultValue = "5") Integer size) {
-        PageDto pageDto = questionService.list(page, size);
+                        @RequestParam(name = "size", defaultValue = "5") Integer size,
+                        @RequestParam(name = "search", required = false) String search) {
+        PageDto pageDto = questionService.listAll(search, page, size);
         model.addAttribute("data", pageDto);
+        model.addAttribute("search", search);
         return "index";
     }
 

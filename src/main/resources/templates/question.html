@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/editormd.preview.min.css" />
     <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/monent.js"></script>
     <script type="text/javascript" src="/js/editormd.min.js"></script>
     <script type="text/javascript" src="/js/lib/marked.min.js"></script>
     <script type="text/javascript" src="/js/lib/prettify.min.js"></script>
@@ -104,14 +105,13 @@
                     <div class="media">
                         <div class="media-left">
                             <a href="#">
-                                <img th:src="${question.user.avatarUrl}"
-                                     class="media-object img-rounded" alt="头像">
-                                <!--  src="https://avatars3.githubusercontent.com/u/6257457?v=4"-->
+                                <img class="media-object img-rounded"
+                                     th:src="${session.user != null ? session.user.avatarUrl : '/images/default-avatar.png'}">
                             </a>
                         </div>
                         <div class="media-body">
                             <h5 class="media-heading">
-                                <span th:text="${question.user.name}"></span>
+                                <span th:text="${session.user != null ? session.user.name : '匿名用户'}"></span>
                             </h5>
                         </div>
                     </div>
@@ -155,6 +155,7 @@
         </div>
     </div>
 </div>
+<div th:insert="common/footer.html"></div>
 <script type="text/javascript">
     
 

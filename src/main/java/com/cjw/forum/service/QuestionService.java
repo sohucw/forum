@@ -53,9 +53,14 @@ public class QuestionService {
     }
 
 
-    public PageDto list(Integer page, Integer size) {
+    public PageDto listAll(String search, Integer page, Integer size) {
+        if(StringUtils.isNoneBlank(search)) {
+            String[] searchs = StringUtils.split(search, " ");
+            search = Arrays.stream(searchs).collect(Collectors.joining("|"));
+            // questionMapper.countBySearch(search);
+        }
         PageDto pageDto = new PageDto();
-        Integer count = questionMapper.count();
+        Integer count = questionMapper.countBySearch(search);
         Integer totalPage;
         if (count % size == 0) {
             totalPage = count / size;
@@ -73,7 +78,7 @@ public class QuestionService {
             page = totalPage;
         }
         pageDto.setPagination(totalPage, page);
-        List<Question> list = questionMapper.list(offset, size);
+        List<Question> list = questionMapper.listAllBySearch(search, offset, size);
         List<QuestionDto> questionDtoList = new ArrayList<>();
 
 

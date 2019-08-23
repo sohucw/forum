@@ -19,14 +19,36 @@ public interface QuestionMapper {
     @Insert("insert into question (title,description,tag,gmt_create,gmt_modified,creator) values (#{title}, #{description}, #{tag}, #{gmtCreate}, #{gmtModified}, #{creator})")
     void create(Question question);
 
-    @Select("select * from question order by gmt_create desc limit #{offset}, #{size}")
-    List<Question> list(@Param(value = "offset") Integer offset, @Param(value = "size")Integer size);
+    // @Select("select * from question order by gmt_create desc limit #{offset}, #{size}")
+    // List<Question> listAll(@Param(value = "offset") Integer offset, @Param(value = "size")Integer size);
 
     @Select("select * from question where id != #{id} and tag regexp #{tag}")
     List<Question> listLikeTag(Long id, String tag);
 
-    @Select("select count(1) from question")
-    Integer count();
+    // @Select("select count(1) from question")
+    // Integer count();
+
+    @Select({"<script>",
+            "select * from question",
+            // "WHERE 1=1",
+            "<when test='search!=null'>",
+            "where title regexp #{search}",
+            "</when>",
+            "order by gmt_create desc limit #{offset}, #{size}",
+            "</script>"})
+    // @Select("select * from question where title regexp #{search} order by gmt_create desc limit #{offset}, #{size}")
+    List<Question> listAllBySearch(@Param("search") String search, @Param(value = "offset") Integer offset, @Param(value = "size")Integer size);
+
+    @Select({"<script>",
+            "select count(*) from question",
+            // "WHERE 1=1",
+            "<when test='search!=null'>",
+            "where title regexp #{search}",
+            "</when>",
+            "</script>"})
+    // @Select("select count(1) from question where title regexp ${search}")
+    Integer countBySearch(@Param("search") String search);
+
     @Select("select * from question where creator = #{userId} limit #{offset}, #{size}")
     List<Question> listByUserId(@Param("userId") Long userId, Integer offset, Integer size);
 

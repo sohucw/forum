@@ -91,3 +91,7 @@ img.media-object{
     display: inline-block;
     cursor: pointer;
 }
+.footer {
+    text-align: center;
+    color: #666;
+}

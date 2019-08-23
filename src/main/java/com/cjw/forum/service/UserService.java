@@ -22,7 +22,7 @@ public class UserService {
 
         if (dbUser == null) {
             user.setGmtCreate(System.currentTimeMillis());
-            dbUser.setGmtModified(System.currentTimeMillis());
+            user.setGmtModified(System.currentTimeMillis());
             userMapper.insert(user);
         } else {
             dbUser.setGmtModified(System.currentTimeMillis());
