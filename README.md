@@ -1,5 +1,28 @@
 # Getting Started
 
+## 部署
+### 依赖
+- git
+- jdk
+- maven
+- mysql
+
+##步骤 centeros 系统
+- yun update
+- yum install git
+- mkdir app
+- cd app
+- git clone github.io.forum.git
+- yum install maven
+- mvn -v
+- mvn clean compile package
+- cp xxx/xx/application.properties  xxxx/ss/application-prod.properties
+- vim  application-prod.properties
+
+- mvn package
+
+- java -jar -Dspring.profiles.active=prod target/forum-0.0.1-snapshot.jar
+
 ### 技巧
 git commit --amend --no-edit   （追加  不需要改备注文案）
 
@@ -15,6 +38,9 @@ https://github.com/settings/apps/chenyimo-forum
 
 [markdown富文本编辑](http://editor.md.ipandao.com/examples/)
 [ufile sdk](https://github.com/ucloud/ufile-sdk-java)
+
+[ucloud文件存储](https://console.ucloud.cn/ufile/ufile/detail?id=cym) 
+
 ### 开源的论坛 类似这个（https://elasticsearch.cn ）
 
 ### Reference Documentation

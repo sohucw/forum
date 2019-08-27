@@ -5,6 +5,7 @@ import com.cjw.forum.dto.GithubUser;
 import com.cjw.forum.model.User;
 import com.cjw.forum.provider.GithubProvider;
 import com.cjw.forum.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import java.util.UUID;
  * @Date: Created in 18:53 2019-08-13
  */
 @Controller
+@Slf4j
 public class AuthorizeController {
 
     @Autowired
@@ -70,6 +72,7 @@ public class AuthorizeController {
             return "redirect:/"; // redirect:index
         } else {
             // 失败
+            log.error("callback get github error, {}", githubUser);
             return "redirect:/";// redirect:index
         }
     }
