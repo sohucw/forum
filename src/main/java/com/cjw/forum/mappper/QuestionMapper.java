@@ -31,7 +31,7 @@ public interface QuestionMapper {
     @Select({"<script>",
             "select * from question",
             // "WHERE 1=1",
-            "<when test='search!=null'>",
+            "<when test='search!=null and search!=\"\"'>",
             "where title regexp #{search}",
             "</when>",
             "order by gmt_create desc limit #{offset}, #{size}",
@@ -42,7 +42,7 @@ public interface QuestionMapper {
     @Select({"<script>",
             "select count(*) from question",
             // "WHERE 1=1",
-            "<when test='search!=null'>",
+            "<when test='search!=null and search!=\"\"'>",
             "where title regexp #{search}",
             "</when>",
             "</script>"})

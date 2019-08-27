@@ -23,6 +23,9 @@
 
 - java -jar -Dspring.profiles.active=prod target/forum-0.0.1-snapshot.jar
 
+
+
+
 ### 技巧
 git commit --amend --no-edit   （追加  不需要改备注文案）
 
@@ -104,3 +107,6 @@ else
 12%5==0 12/5
 
 select * from QUESTION limit 0,5;
+
+
+## 技术站
